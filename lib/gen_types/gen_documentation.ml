@@ -1,0 +1,62 @@
+let rec render_type (t : Types.t) ~type_namespace =
+  match t with
+  | PrimitiveType Str -> "String"
+  | PrimitiveType I32 -> "32-bit Integer"
+  | PrimitiveType U32 -> "32-bit Unsigned Integer"
+  | PrimitiveType I63 -> "64-bit Integer"
+  | PrimitiveType F32 -> "32-bit Float"
+  | PrimitiveType F64 -> "64-bit Float"
+  | PrimitiveType Bool -> "Boolean"
+  | PrimitiveType Unit -> "Unit"
+  | PrimitiveType Json -> failwith "not implemented"
+  | TypeName n ->
+      Format.sprintf "[%s](#%s)" (Names.to_pascal_case n)
+        (type_namespace ^ Names.to_pascal_case n)
+  | Vec t -> Format.sprintf "Array of (%s)" (render_type t ~type_namespace)
+  | Option t -> Format.sprintf "Optional (%s)" (render_type t ~type_namespace)
+  | Nullable t -> Format.sprintf "Nullable (%s)" (render_type t ~type_namespace)
+  | Map { key_t = _; value_t = _ } -> failwith "not implemented"
+
+let render_struct_field (f : Types.field) =
+  Format.sprintf "|%s|%s|" f.field_name
+    (render_type f.field_t ~type_namespace:"")
+
+let deriving = function
+  | [] -> ""
+  | ppxes -> Format.sprintf " [@@@@deriving %s]" (String.concat ", " ppxes)
+
+let linkable_anchor name = Format.sprintf "<a name=\"%s\">%s</a>" name name
+
+let gen_type_documentation (decl : Types.type_declaration) ~type_namespace =
+  match decl with
+  | Types.TypeAlias { name; t } ->
+      Format.sprintf "## %s\n\n  is an alias for %s"
+        (linkable_anchor (Names.to_pascal_case name))
+        (render_type t ~type_namespace)
+  | StructUnion { name; variants } ->
+      let gen_variant ~prefix (s : Types.struct_) =
+        Format.sprintf "* `%s`\n\n%s\n" (prefix ^ s.struct_name)
+          (String.concat "\n"
+             ([ "|field_name|type|"; "|-|-|" ]
+             @ List.map render_struct_field s.fields))
+      in
+      let variants =
+        List.map
+          (fun (variant : Types.struct_) -> gen_variant ~prefix:name variant)
+          variants
+      in
+      Format.sprintf "## %s\n\n  is one of these variants:\n\n%s"
+        (linkable_anchor (Names.to_pascal_case name))
+        (String.concat "\n" variants)
+  | Struct s ->
+      Format.sprintf "## %s\n\nis a struct with these fields:\n%s"
+        (linkable_anchor (Names.to_pascal_case s.struct_name))
+        (String.concat "\n"
+           ([ "|name|type|"; "|-|-|" ] @ List.map render_struct_field s.fields))
+  | StringEnum { name; options } ->
+      Format.sprintf "## %s\n\nis a string enum with these options:\n%s"
+        (linkable_anchor (Names.to_pascal_case name))
+        (String.concat "\n"
+           ([ "|option|"; "|-|" ]
+           @ List.map (fun o -> Format.sprintf "|%s|" o) options))
+  | IntEnum { name = _; options = _ } -> failwith "not implemented"

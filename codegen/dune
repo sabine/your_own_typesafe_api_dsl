@@ -1,0 +1,4 @@
+(executable
+ (public_name codegen)
+ (name main)
+ (libraries api_spec gen_types gen_endpoints unix fpath))

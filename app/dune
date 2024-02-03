@@ -1,0 +1,13 @@
+(executable
+ (public_name main)
+ (name main)
+ (libraries api dream)
+ (modules main home)
+ (preprocess
+  (pps lwt_ppx ppx_yojson_conv)))
+
+(rule
+ (targets home.ml)
+ (deps home.eml)
+ (action
+  (run dream_eml %{deps} --workspace %{workspace_root})))
