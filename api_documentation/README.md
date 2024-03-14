@@ -28,11 +28,22 @@ is an ID type (String)
 
 ## <a name="User">User</a>
 
-is a struct with these fields:
-|name|type|
+  is one of these variants:
+
+* `UserMember`
+
+|field_name|type|
 |-|-|
 |display_name|String|
 |user_id|[UserId](#UserId)|
+
+* `UserAdmin`
+
+|field_name|type|
+|-|-|
+|display_name|String|
+|user_id|[UserId](#UserId)|
+
 
 ## <a name="PaginatedUsers">PaginatedUsers</a>
 

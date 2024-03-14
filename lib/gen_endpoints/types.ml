@@ -16,6 +16,7 @@ let string_enum n options =
 
 let int_enum n options = BasicTypeDecl (Gen_types.Types.int_enum n options)
 let struct_union n v = BasicTypeDecl (Gen_types.Types.struct_union n v)
+let struct_union_variant n f = Gen_types.Types.{ struct_name = n; fields = f }
 
 (* Types specific to this API *)
 

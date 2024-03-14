@@ -31,7 +31,10 @@ end
 
 (* API output types *)
 module User = struct
-  type t = { display_name : string; user_id : UserId.t } [@@deriving yojson]
+  type t =
+    | UserMember of { display_name : string; user_id : UserId.t }
+    | UserAdmin of { display_name : string; user_id : UserId.t }
+  [@@deriving yojson]
 end
 
 module PaginatedUsers = struct

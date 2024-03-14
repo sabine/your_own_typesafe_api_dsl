@@ -34,9 +34,16 @@ let gen_decode_expr ~loc (ct : core_type) : expression =
   | Some name ->
       if name <> "string" then
         if is_option ct then
-          [%expr Option.map [%e evar ~loc (name ^ "_of_string")]]
+          [%expr
+            Option.map (fun v ->
+                v |> Uri.pct_decode |> Yojson.Safe.from_string
+                |> [%e evar ~loc (name ^ "_of_yojson")])]
         else
-          [%expr Option.map [%e evar ~loc (name ^ "_of_string")] |> Option.get]
+          [%expr
+            Option.map (fun v ->
+                v |> Uri.pct_decode |> Yojson.Safe.from_string
+                |> [%e evar ~loc (name ^ "_of_yojson")])
+            |> Option.get]
       else [%expr fun id -> id]
 
 let query_parser_impl acc (ld : label_declaration) =
