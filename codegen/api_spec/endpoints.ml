@@ -13,6 +13,12 @@ let endpoints =
               url_params = None;
               input_type =
                 Fields [ field "display_name" str; field "user_id" T.user_id ];
+                (* Fields
+                  [
+                    field "display_name" str;
+                    field "user_id" T.user_id;
+                    field "recruited_by" T.user_id;
+                  ]; *)
               query_param_type = None;
               output_type = Fields [ field "user_id" T.user_id ];
               error_type = None;

@@ -1,7 +1,5 @@
 import { API_KEY, API_URL, fetch } from "./config";
 
-/* TODO: this entire file is bullshit and needs to be rewritten */
-
 export type ApiResponse<S> = S;
 
 type NotFound = {

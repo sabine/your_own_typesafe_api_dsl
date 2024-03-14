@@ -42,8 +42,7 @@ let gen_variant ~prefix (s : Types.struct_) =
     (String.concat ",\n    " (List.map render_struct_field s.fields))
 
 let gen_struct (s : Types.struct_) =
-  Format.sprintf "export type %s = {\n    type: \"%s\";\n    %s\n}"
-    s.struct_name s.struct_name
+  Format.sprintf "export type %s = {\n    %s\n}" s.struct_name
     (String.concat ",\n    " (List.map render_struct_field s.fields))
 
 let gen_type_declaration (decl : Types.type_declaration) ~type_namespace =

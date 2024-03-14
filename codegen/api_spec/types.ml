@@ -25,13 +25,6 @@ let ot =
     [
       struct_ (u Ot.user)
         [ field "display_name" str; field "user_id" T.user_id ];
-      (* struct_union (u Ot.user)
-         [
-           struct_union_variant "Member"
-             [ field "display_name" str; field "user_id" T.user_id ];
-           struct_union_variant "Admin"
-             [ field "display_name" str; field "user_id" T.user_id ];
-         ]; *)
       paginate Ot.paginated_users Ot.user T.user_id;
       struct_ (u Ot.parent_line)
         [

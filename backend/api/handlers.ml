@@ -24,6 +24,7 @@ module Server = struct
 
   let create_user _req ({ user_id; display_name } : T.CreateUserInput.t) =
     let new_user = User.{ user_id; display_name } in
+    (* let _ = recruited_by in *)
     match UsersSet.find_opt new_user !users_state with
     | Some _ ->
         Lwt.return

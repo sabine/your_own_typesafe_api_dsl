@@ -129,7 +129,8 @@ end
 module CreateUserInput = struct
   type t = {
     display_name: string;
-    user_id: UserId.t
+    user_id: UserId.t;
+    recruited_by: UserId.t
 } [@@deriving of_yojson]
   
 end
