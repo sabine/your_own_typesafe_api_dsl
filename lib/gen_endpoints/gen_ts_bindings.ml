@@ -24,10 +24,6 @@ module Api_types = struct
         Gen_types.(
           Gen_typescript.gen_type_declaration ~type_namespace
             Types.(alias (t name) str))
-    | CursorType name ->
-        Gen_types.(
-          Gen_typescript.gen_type_declaration ~type_namespace
-            Types.(alias (t name) str))
 
   let gen_types ~(t : Types.type_declaration list)
       ~(it : Types.type_declaration list) ~(ot : Types.type_declaration list)

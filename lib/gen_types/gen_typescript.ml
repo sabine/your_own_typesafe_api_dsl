@@ -2,8 +2,8 @@ let rec render_type (t : Types.t) ~type_namespace =
   match t with
   | PrimitiveType Str -> "string"
   | PrimitiveType I32 -> "number"
-  | PrimitiveType I63 -> "number"
   | PrimitiveType U32 -> "number"
+  | PrimitiveType I63 -> "number"
   | PrimitiveType F32 -> "number"
   | PrimitiveType F64 -> "number"
   | PrimitiveType Bool -> "boolean"

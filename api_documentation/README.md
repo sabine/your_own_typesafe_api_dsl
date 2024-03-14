@@ -6,17 +6,9 @@
 
 is an ID type (String)
 
-## UserCursor
-
-is a Cursor type (String)
-
 ## ConversationId
 
 is an ID type (String)
-
-## ConversationCursor
-
-is a Cursor type (String)
 
 ## LineId
 

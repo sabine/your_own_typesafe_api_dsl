@@ -13,9 +13,7 @@ let t =
   Gen_endpoints.Types.
     [
       id_type (u T.user_id);
-      cursor_type (u T.user_cursor);
       id_type (u T.conversation_id);
-      cursor_type (u T.conversation_cursor);
       id_type (u T.line_id);
       alias T.date_time str;
     ]

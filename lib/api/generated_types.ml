@@ -7,34 +7,8 @@ module UserId = struct
   type t = string [@@deriving yojson]
 end
 
-module UserCursor = struct
-  type t = int64
-
-  let string_of_t = Int64.to_string
-  let t_of_string = Int64.of_string
-  let yojson_of_t v = `String (string_of_t v)
-
-  let t_of_yojson v =
-    match v with
-    | `String s -> t_of_string s
-    | _ -> raise (Invalid_argument "Could not parse cursor value")
-end
-
 module ConversationId = struct
   type t = string [@@deriving yojson]
-end
-
-module ConversationCursor = struct
-  type t = int64
-
-  let string_of_t = Int64.to_string
-  let t_of_string = Int64.of_string
-  let yojson_of_t v = `String (string_of_t v)
-
-  let t_of_yojson v =
-    match v with
-    | `String s -> t_of_string s
-    | _ -> raise (Invalid_argument "Could not parse cursor value")
 end
 
 module LineId = struct

@@ -84,5 +84,5 @@ let () =
 
   (* TypeScript sdk *)
   gen_typescript_bindings ~t ~it ~ot ~endpoints
-    ~types_output_path:"sdks/TypeScript/src/generated/types.ts"
-    ~endpoints_output_path:"sdks/TypeScript/src/generated/endpoints.ts"
+    ~types_output_path:"bindings/TypeScript/src/generated/types.ts"
+    ~endpoints_output_path:"bindings/TypeScript/src/generated/endpoints.ts"
