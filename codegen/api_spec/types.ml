@@ -16,6 +16,18 @@ let t =
       id_type (u T.conversation_id);
       id_type (u T.line_id);
       alias T.date_time str;
+      (* struct_ (u T.user) [ field "display_name" str; field "user_id" T.user_id ]; *)
+      struct_union (u T.user)
+        [
+          struct_union_variant "Member"
+            [ field "display_name" str; field "user_id" T.user_id ];
+          struct_union_variant "Business"
+            [
+              field "display_name" str;
+              field "user_id" T.user_id;
+              field "vat_nr" str;
+            ];
+        ];
     ]
 
 let it = []
@@ -23,21 +35,12 @@ let it = []
 let ot =
   Gen_endpoints.Types.
     [
-      struct_ (u Ot.user)
-        [ field "display_name" str; field "user_id" T.user_id ];
-      (* struct_union (u Ot.user)
-         [
-           struct_union_variant "Member"
-             [ field "display_name" str; field "user_id" T.user_id ];
-           struct_union_variant "Admin"
-             [ field "display_name" str; field "user_id" T.user_id ];
-         ]; *)
-      paginate Ot.paginated_users Ot.user T.user_id;
+      paginate Ot.paginated_users T.user T.user_id;
       struct_ (u Ot.parent_line)
         [
           field "line_id" T.line_id;
           field "timestamp" T.date_time;
-          field "from" Ot.user;
+          field "from" T.user;
           field "message" str;
           field "data" str;
           (* JSON *)
@@ -46,7 +49,7 @@ let ot =
         [
           field "line_id" T.line_id;
           field "timestamp" T.date_time;
-          field "from" Ot.user;
+          field "from" T.user;
           field "message" str;
           field "data" str;
           (* JSON *)
@@ -58,13 +61,13 @@ let ot =
         [
           struct_union_variant "NewLine" [ field "line" Ot.line ];
           struct_union_variant "Join"
-            [ field "timestamp" T.date_time; field "from" Ot.user ];
+            [ field "timestamp" T.date_time; field "from" T.user ];
           struct_union_variant "Leave"
-            [ field "timestamp" T.date_time; field "from" Ot.user ];
+            [ field "timestamp" T.date_time; field "from" T.user ];
           struct_union_variant "StartTyping"
-            [ field "timestamp" T.date_time; field "from" Ot.user ];
+            [ field "timestamp" T.date_time; field "from" T.user ];
           struct_union_variant "EndTyping"
-            [ field "timestamp" T.date_time; field "from" Ot.user ];
+            [ field "timestamp" T.date_time; field "from" T.user ];
         ];
       struct_ (u Ot.conversation)
         [

@@ -20,11 +20,23 @@ is an ID type (String)
 
 ## <a name="User">User</a>
 
-is a struct with these fields:
-|name|type|
+  is one of these variants:
+
+* `UserMember`
+
+|field_name|type|
 |-|-|
 |display_name|String|
 |user_id|[UserId](#UserId)|
+
+* `UserBusiness`
+
+|field_name|type|
+|-|-|
+|display_name|String|
+|user_id|[UserId](#UserId)|
+|vat_nr|String|
+
 
 ## <a name="PaginatedUsers">PaginatedUsers</a>
 
@@ -136,7 +148,7 @@ Input body:
   |name|type|
   |-|-|
   |display_name|String|
-  |user_id|[UserId](#UserId)|
+  |user_id|String|
 
 Response body:
   |name|type|
@@ -194,11 +206,6 @@ URL params:
 create a new conversation
 
 POST /converations
-
-Query Parameters:
-  |name|type|
-  |-|-|
-  |user|string|
 
 Input body:
   |name|type|

@@ -1,51 +1,10 @@
 import { API_KEY, API_URL, fetch } from "./config";
 
-export type ApiResponse<S> = S;
+export type ApiResponse<S> =
+  { data: S }
+| {error: true; status: number; data?: { message: string}};
 
-type NotFound = {
-    type: 'NotFound';
-    status: 404;
-};
-
-type NotAuthenticated = {
-    type: 'NotAuthenticated';
-    status: 401;
-};
-
-type Forbidden = {
-    type: 'Forbidden';
-    body: {
-        message: string;
-    };
-    status: 403;
-};
-
-type BadRequest = {
-    type: 'BadRequest';
-    body: {
-        message: string;
-    };
-    status: 400;
-};
-
-type InternalError = {
-    type: 'InternalError';
-    body: {
-        message: string;
-    };
-    status: 500;
-};
-
-export type ApiResponseError =
-    (
-        | NotFound
-        | NotAuthenticated
-        | Forbidden
-        | BadRequest
-        | InternalError
-    );
-
-function maker_database_api_fetch(url: string, opts: any): Promise<ApiResponse<any>> {
+function api_fetch(url: string, opts: any): Promise<ApiResponse<any>> {
     let fetch_url = API_URL + url;
     console.log(['fetch_url', fetch_url]);
     const response = fetch(fetch_url, opts).then(async (res: Response) => {
@@ -54,7 +13,9 @@ function maker_database_api_fetch(url: string, opts: any): Promise<ApiResponse<a
         switch (res.status) {
             case 200:
                 return res.json().then((data) => {
-                    let d = {...data[1], "tag": data[0]};
+                    let d = {
+                        data
+                    };
                     console.log("d", d);
                     return d;
                 });
@@ -63,7 +24,7 @@ function maker_database_api_fetch(url: string, opts: any): Promise<ApiResponse<a
                     return {
                         error: true,
                         status: res.status,
-                        body: data
+                        data
                     };
                 });
         }
@@ -85,7 +46,7 @@ export function get(url: string) {
     };
     if (!API_KEY) throw "api_key is not set via init({.., api_key: YOUR_API_KEY})";
     headers['X-Access-Token'] = API_KEY;
-    return maker_database_api_fetch(url, {
+    return api_fetch(url, {
         headers
     });
 }
@@ -98,7 +59,7 @@ export function post(url: string, body?: any) {
     };
     if (!API_KEY) throw "api_key is not set via init({.., api_key: YOUR_API_KEY})";
     headers['X-Access-Token'] = API_KEY;
-    return maker_database_api_fetch(url, {
+    return api_fetch(url, {
         method: 'POST',
         body: b,
         headers
@@ -112,7 +73,7 @@ export function del(url: string) {
     };
     if (!API_KEY) throw "api_key is not set via init({.., api_key: YOUR_API_KEY})";
     headers['X-Access-Token'] = API_KEY;
-    return maker_database_api_fetch(url, {
+    return api_fetch(url, {
         method: 'DELETE',
         headers
     });
@@ -128,7 +89,7 @@ export async function postFormData(
     if (!API_KEY) throw "api_key is not set via Chattelite.init({.., api_key: YOUR_API_KEY})";
     headers['X-Access-Token'] = API_KEY;
 
-    return maker_database_api_fetch(url, {
+    return api_fetch(url, {
         method: 'POST',
         body: formData,
         headers

@@ -12,7 +12,7 @@ let endpoints =
             {
               url_params = None;
               input_type =
-                Fields [ field "display_name" str; field "user_id" T.user_id ];
+                Fields [ field "display_name" str; field "user_id" str ];
               query_param_type = None;
               output_type = Fields [ field "user_id" T.user_id ];
               error_type = None;
@@ -47,7 +47,7 @@ let endpoints =
             {
               url_params = Some [ { name = "user_id"; t = T.user_id } ];
               query_param_type = None;
-              output_type = Fields [ field "user" Ot.user ];
+              output_type = Fields [ field "user" T.user ];
             };
       };
       {
@@ -72,7 +72,7 @@ let endpoints =
               url_params = None;
               input_type =
                 Fields [ field "user_ids" (vec T.user_id); field "data" str ];
-              query_param_type = Fields QueryParams.[ field "user" Str ];
+              query_param_type = None;
               output_type = Fields [ field "conversation_id" T.conversation_id ];
               error_type = None;
             };

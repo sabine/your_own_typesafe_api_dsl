@@ -19,13 +19,13 @@ module DateTime = struct
   type t = string [@@deriving yojson]
 end
 
-(* API input types *)
-
-(* API output types *)
 module User = struct
   type t = { display_name : string; user_id : UserId.t } [@@deriving yojson]
 end
 
+(* API input types *)
+
+(* API output types *)
 module PaginatedUsers = struct
   type t = {
     next : UserId.t option;
@@ -94,7 +94,7 @@ end
 (* endpoint types *)
 
 module CreateUserInput = struct
-  type t = { display_name : string; user_id : UserId.t } [@@deriving of_yojson]
+  type t = { user : User.t } [@@deriving of_yojson]
 end
 
 module CreateUserOutput = struct

@@ -1,6 +1,7 @@
 open Gen_types.Types
 
 module T = struct
+  let user = t "User"
   let date_time = t "DateTime"
   let user_id = t "UserId"
   let user_cursor = t "UserCursor"
@@ -12,7 +13,6 @@ end
 module It = struct end
 
 module Ot = struct
-  let user = t "User"
   let paginated_users = t "PaginatedUsers"
   let conversation = t "Conversation"
   let paginated_conversations = t "PaginatedConversations"

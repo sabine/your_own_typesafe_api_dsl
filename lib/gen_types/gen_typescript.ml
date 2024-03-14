@@ -38,7 +38,7 @@ let render_struct_field (f : Types.field) =
 
 let gen_variant ~prefix (s : Types.struct_) =
   Format.sprintf "export type %s = [\"%s\", {\n    %s\n}]"
-    (prefix ^ s.struct_name) s.struct_name
+    (prefix ^ s.struct_name) (prefix ^ s.struct_name)
     (String.concat ",\n    " (List.map render_struct_field s.fields))
 
 let gen_struct (s : Types.struct_) =
