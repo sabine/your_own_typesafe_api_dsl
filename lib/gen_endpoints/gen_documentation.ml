@@ -1,11 +1,23 @@
 let render_type (t : Gen_types.Types.t) =
   Gen_types.Gen_documentation.render_type t ~type_namespace:""
 
+let render_query_param_type (t : Types.QueryParams.value_t) =
+  match t with
+  | Str -> "string"
+  | Int -> "integer"
+  | Float -> "float"
+  | StrList -> "string list"
+
 let gen_endpoint_doc (route : Types.route) =
   let meth, url_params, query_params, input_type, output_type, _error_type =
     match route.shape with
     | Get { url_params; query_param_type; output_type } ->
-        ("GET", url_params, query_param_type, Types.None, output_type, None)
+        ( "GET",
+          url_params,
+          query_param_type,
+          Types.JsonBody.None,
+          output_type,
+          None )
     | Post { url_params; query_param_type; input_type; output_type; error_type }
       ->
         ( "POST",
@@ -15,7 +27,12 @@ let gen_endpoint_doc (route : Types.route) =
           output_type,
           error_type )
     | Delete { url_params; output_type; error_type } ->
-        ("DELETE", url_params, Types.None, Types.None, output_type, error_type)
+        ( "DELETE",
+          url_params,
+          Types.QueryParams.None,
+          Types.JsonBody.None,
+          output_type,
+          error_type )
   in
   let url_params =
     match url_params with
@@ -40,9 +57,9 @@ let gen_endpoint_doc (route : Types.route) =
           ^ String.concat "\n  "
               ([ "|name|type|"; "|-|-|" ]
               @ List.map
-                  (fun (p : Gen_types.Types.field) ->
-                    Format.sprintf "|%s|%s|" p.field_name
-                      (render_type p.field_t))
+                  (fun (p : Types.QueryParams.field_t) ->
+                    Format.sprintf "|%s|%s|" p.name
+                      (render_query_param_type p.t))
                   fs);
         ]
   in

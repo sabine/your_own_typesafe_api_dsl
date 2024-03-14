@@ -28,12 +28,13 @@ let endpoints =
               url_params = None;
               query_param_type =
                 Fields
-                  [
-                    field "name" (option str);
-                    field "next" (option T.user_cursor);
-                    field "prev" (option T.user_cursor);
-                    field "limit" (option i63);
-                  ];
+                  QueryParams.
+                    [
+                      field "name" Str;
+                      field "next" Int;
+                      field "prev" Int;
+                      field "limit" Int;
+                    ];
               output_type = Fields [ field "users" Ot.paginated_users ];
             };
       };
@@ -71,13 +72,13 @@ let endpoints =
               url_params = None;
               input_type =
                 Fields [ field "user_ids" (vec T.user_id); field "data" str ];
-              query_param_type = None;
+              query_param_type = Fields QueryParams.[ field "user" Str ];
               output_type = Fields [ field "conversation_id" T.conversation_id ];
               error_type = None;
             };
       };
       {
-        name = "update_converstaion";
+        name = "update_conversation";
         url = "/converation/{conversation_id}";
         docstring = "update data on a conversation";
         shape =

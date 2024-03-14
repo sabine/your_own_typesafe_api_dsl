@@ -46,7 +46,7 @@ end
 let gen_types = Api_types.gen_types
 
 module Route_types = struct
-  let gen_input_type ~route_name (route_params : Types.route_params)
+  let gen_input_type ~route_name (route_params : Types.JsonBody.t)
       ~type_namespace =
     match route_params with
     | Fields fields ->
@@ -54,12 +54,20 @@ module Route_types = struct
           (Types.struct_ (input_type_name ~route_name) fields)
     | None -> ""
 
-  let gen_route_params_type ~name (route_params : Types.route_params)
+  let gen_route_params_type ~name (route_params : Types.JsonBody.t)
       ~type_namespace =
     match route_params with
     | Fields fields ->
         Api_types.gen_type_declaration_for_api_type ~type_namespace
           (Types.struct_ name fields)
+    | None -> Format.sprintf "export type %s = {}" name
+
+  let gen_query_params_type ~name (query_params : Types.QueryParams.t)
+      ~type_namespace =
+    match query_params with
+    | Fields _ ->
+        Api_types.gen_type_declaration_for_api_type ~type_namespace
+          (Types.QueryParams.struct_of_t name query_params)
     | None -> Format.sprintf "export type %s = {}" name
 
   let gen_response_type ~route_name =
@@ -78,7 +86,7 @@ module Route_types = struct
         let query_t =
           if s.query_param_type != None then
             [
-              gen_route_params_type
+              gen_query_params_type
                 ~name:(query_param_type_name ~route_name:route.name)
                 s.query_param_type ~type_namespace;
             ]
@@ -96,7 +104,16 @@ module Route_types = struct
             ~name:(output_type_name ~route_name:route.name)
             s.output_type ~type_namespace
         in
-        [ input_t; output_t ]
+        let query_t =
+          if s.query_param_type != None then
+            [
+              gen_query_params_type
+                ~name:(query_param_type_name ~route_name:route.name)
+                s.query_param_type ~type_namespace;
+            ]
+          else []
+        in
+        query_t @ [ input_t; output_t ]
     | Delete s ->
         let output_t =
           gen_route_params_type
@@ -117,7 +134,7 @@ module Route_code = struct
         (Option.value ~default:[] url_params)
     in
 
-    let params_of_query_param_type (query_param_type : Types.route_params) =
+    let params_of_query_param_type (query_param_type : Types.QueryParams.t) =
       match query_param_type with
       | None -> []
       | _ ->

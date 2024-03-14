@@ -56,39 +56,42 @@ let delete_user (req : Dream.request) =
   | Error response -> response
 
 let create_conversation (req : Dream.request) =
-  let* body = Dream.body req in
-  let body =
-    Generated_types.CreateConversationInput.t_of_yojson
-      (Yojson.Safe.from_string body)
-  in
-  let* (result :
-         ( Generated_types.CreateConversationOutput.t,
-           Dream.response Lwt.t )
-         result) =
-    Handlers.Server.create_conversation req body
-  in
-  match result with
-  | Ok result ->
-      result |> Generated_types.CreateConversationOutput.yojson_of_t
-      |> Yojson.Safe.to_string |> Dream.json
-  | Error response -> response
+  match Generated_types.CreateConversationQuery.parse_query req with
+  | Error msg -> Handlers.Server.bad_request msg
+  | Ok query -> (
+      let* body = Dream.body req in
+      let body =
+        Generated_types.CreateConversationInput.t_of_yojson
+          (Yojson.Safe.from_string body)
+      in
+      let* (result :
+             ( Generated_types.CreateConversationOutput.t,
+               Dream.response Lwt.t )
+             result) =
+        Handlers.Server.create_conversation req query body
+      in
+      match result with
+      | Ok result ->
+          result |> Generated_types.CreateConversationOutput.yojson_of_t
+          |> Yojson.Safe.to_string |> Dream.json
+      | Error response -> response)
 
-let update_converstaion (req : Dream.request) =
+let update_conversation (req : Dream.request) =
   let conversation_id = Dream.param req "conversation_id" in
   let* body = Dream.body req in
   let body =
-    Generated_types.UpdateConverstaionInput.t_of_yojson
+    Generated_types.UpdateConversationInput.t_of_yojson
       (Yojson.Safe.from_string body)
   in
   let* (result :
-         ( Generated_types.UpdateConverstaionOutput.t,
+         ( Generated_types.UpdateConversationOutput.t,
            Dream.response Lwt.t )
          result) =
-    Handlers.Server.update_converstaion req conversation_id body
+    Handlers.Server.update_conversation req conversation_id body
   in
   match result with
   | Ok result ->
-      result |> Generated_types.UpdateConverstaionOutput.yojson_of_t
+      result |> Generated_types.UpdateConversationOutput.yojson_of_t
       |> Yojson.Safe.to_string |> Dream.json
   | Error response -> response
 
@@ -137,7 +140,7 @@ let routes =
     Dream.get "/user/:user_id" get_user;
     Dream.delete "/user/:user_id" delete_user;
     Dream.post "/converations" create_conversation;
-    Dream.post "/converation/:conversation_id" update_converstaion;
+    Dream.post "/converation/:conversation_id" update_conversation;
     Dream.post "/converation/:conversation_id/add-users"
       add_users_to_conversation;
     Dream.post "/converation/:conversation_id/remove-users"

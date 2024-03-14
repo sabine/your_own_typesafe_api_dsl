@@ -103,6 +103,7 @@ module PaginatedConversations = struct
 end
 
 (* endpoint types *)
+
 module CreateUserInput = struct
   type t = { display_name : string; user_id : UserId.t } [@@deriving of_yojson]
 end
@@ -112,13 +113,8 @@ module CreateUserOutput = struct
 end
 
 module UsersQuery = struct
-  type t = {
-    name : string option;
-    next : UserCursor.t option;
-    prev : UserCursor.t option;
-    limit : int option;
-  }
-  [@@deriving of_yojson, query]
+  type t = { name : string; next : int; prev : int; limit : int }
+  [@@deriving query]
 end
 
 module UsersOutput = struct
@@ -133,6 +129,10 @@ module DeleteUserOutput = struct
   type t = unit [@@deriving yojson_of]
 end
 
+module CreateConversationQuery = struct
+  type t = { user : string } [@@deriving query]
+end
+
 module CreateConversationInput = struct
   type t = { user_ids : UserId.t list; data : string } [@@deriving of_yojson]
 end
@@ -141,11 +141,11 @@ module CreateConversationOutput = struct
   type t = { conversation_id : ConversationId.t } [@@deriving yojson_of]
 end
 
-module UpdateConverstaionInput = struct
+module UpdateConversationInput = struct
   type t = { data : string } [@@deriving of_yojson]
 end
 
-module UpdateConverstaionOutput = struct
+module UpdateConversationOutput = struct
   type t = unit [@@deriving yojson_of]
 end
 

@@ -44,14 +44,18 @@ module Server = struct
              T.GetUserOutput.
                {
                  user =
-                   { user_id = user.user_id; display_name = user.display_name };
+                   UserMember
+                     {
+                       user_id = user.user_id;
+                       display_name = user.display_name;
+                     };
                })
 
   let users _req (_query : T.UsersQuery.t) =
     let users =
       UsersSet.to_list !users_state
       |> List.map (fun User.{ user_id; display_name } ->
-             T.User.{ user_id; display_name })
+             T.User.UserMember { user_id; display_name })
     in
 
     Lwt.return
@@ -67,11 +71,11 @@ module Server = struct
         users_state := UsersSet.remove user !users_state;
         Lwt.return (Ok ())
 
-  let create_conversation _req (_body : T.CreateConversationInput.t) =
+  let create_conversation _req _query (_body : T.CreateConversationInput.t) =
     failwith "not_implemented"
   (*Lwt.return T.CreateConversationOutput.{ conversation_id }*)
 
-  let update_converstaion _req _conversation_id _body =
+  let update_conversation _req _conversation_id _body =
     failwith "not_implemented"
 
   let add_users_to_conversation _req _conversation_id _body =

@@ -33,25 +33,46 @@ type error_variant = {
   title : string;
 }
 
-type route_params = Fields of Gen_types.Types.field list | None
+module JsonBody = struct
+  type t = Fields of Gen_types.Types.field list | None
+end
+
+module QueryParams = struct
+  type value_t = Str | Float | Int | StrList
+  type field_t = { name : string; t : value_t }
+  type t = Fields of field_t list | None
+
+  let field name t = { name; t }
+
+  let type_of_value_t (t : value_t) =
+    match t with Str -> str | Float -> f64 | Int -> i63 | StrList -> vec str
+
+  let struct_field_of_field_t (f : field_t) =
+    Gen_types.Types.(field f.name (type_of_value_t f.t))
+
+  let struct_of_t name (q : t) =
+    match q with
+    | Fields fields -> struct_ name (List.map struct_field_of_field_t fields)
+    | None -> struct_ name []
+end
 
 type get_route = {
   url_params : url_params;
-  query_param_type : route_params;
-  output_type : route_params;
+  query_param_type : QueryParams.t;
+  output_type : JsonBody.t;
 }
 
 type post_route = {
   url_params : url_params;
-  query_param_type : route_params;
-  input_type : route_params;
-  output_type : route_params;
+  query_param_type : QueryParams.t;
+  input_type : JsonBody.t;
+  output_type : JsonBody.t;
   error_type : error_variant list option;
 }
 
 type delete_route = {
   url_params : url_params;
-  output_type : route_params;
+  output_type : JsonBody.t;
   error_type : error_variant list option;
 }
 

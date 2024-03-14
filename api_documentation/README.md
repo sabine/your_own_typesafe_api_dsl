@@ -171,10 +171,10 @@ GET /users
 Query Parameters:
   |name|type|
   |-|-|
-  |name|Optional (String)|
-  |next|Optional ([UserCursor](#UserCursor))|
-  |prev|Optional ([UserCursor](#UserCursor))|
-  |limit|Optional (63-bit Integer)|
+  |name|string|
+  |next|integer|
+  |prev|integer|
+  |limit|integer|
 
 Response body:
   |name|type|
@@ -214,6 +214,11 @@ create a new conversation
 
 POST /converations
 
+Query Parameters:
+  |name|type|
+  |-|-|
+  |user|string|
+
 Input body:
   |name|type|
   |-|-|
@@ -225,7 +230,7 @@ Response body:
   |-|-|
   |conversation_id|[ConversationId](#ConversationId)|
 
-## <a name="update_converstaion">update_converstaion</a>
+## <a name="update_conversation">update_conversation</a>
 
 update data on a conversation
 

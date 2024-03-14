@@ -177,9 +177,6 @@ class GenericQueryParams implements QueryParamsInterface {
                         url_encode_add_key_value_pair(result, key, o.join(','));
                         continue;
                     }
-                    /*if (typeof o[0] === "object" && o[0].hasOwnProperty("url_encode")) {
-                        continue;
-                    }*/
                 }
                 throw 'url_encode not implemented for ' + typeof o + ' ' + JSON.stringify(o);
             }

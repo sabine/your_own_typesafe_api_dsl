@@ -14,23 +14,30 @@ let input_type_name ~route_name ~type_namespace =
   Format.sprintf "%sInput"
     (type_namespace ^ Gen_types.Names.to_pascal_case route_name)
 
-let gen_input_type ~route_name (route_params : Types.route_params)
-    ~type_namespace =
-  match route_params with
+let gen_input_type ~route_name (json_body : Types.JsonBody.t) ~type_namespace =
+  match json_body with
   | Fields fields ->
       gen_type_declaration_for_api_type ~type_namespace ~ppxes:[ "yojson" ]
         (Types.struct_ (input_type_name ~type_namespace ~route_name) fields)
   | None -> ""
 
-(* query param type *)
-
 let query_param_type_name ~route_name ~type_namespace =
   Format.sprintf "%sQuery"
     (type_namespace ^ Gen_types.Names.to_pascal_case route_name)
 
-let gen_route_params_type ~name (route_params : Types.route_params)
+let gen_query_param_type ~name (query_params : Types.QueryParams.t)
     ~type_namespace ~ppxes =
-  match route_params with
+  match query_params with
+  | Fields _ ->
+      gen_type_declaration_for_api_type ~type_namespace ~ppxes
+        (Types.QueryParams.struct_of_t name query_params)
+  | None ->
+      gen_type_declaration_for_api_type ~type_namespace ~ppxes
+        Types.(alias (t name) unit)
+
+let gen_json_body_type ~name (json_body : Types.JsonBody.t) ~type_namespace
+    ~ppxes =
+  match json_body with
   | Fields fields ->
       gen_type_declaration_for_api_type ~type_namespace ~ppxes
         (Types.struct_ name fields)
@@ -48,7 +55,7 @@ let response_type_name ~route_name ~type_namespace =
 
 type route_param = { name : string; t : string }
 
-let route_params = [ { name = "req"; t = "Dream.request" } ]
+let json_body = [ { name = "req"; t = "Dream.request" } ]
 
 let handler_params (route : Types.route) ~type_namespace =
   let params_of_url_params (url_params : Types.url_param list option) =
@@ -57,7 +64,7 @@ let handler_params (route : Types.route) ~type_namespace =
         { name; t = Gen_types.Gen_ocaml.render_type t ~type_namespace })
       (Option.value ~default:[] url_params)
   in
-  let params_of_query_param_type (query_param_type : Types.route_params) =
+  let params_of_query_param_type (query_param_type : Types.QueryParams.t) =
     match query_param_type with
     | None -> []
     | _ ->
@@ -89,7 +96,7 @@ let handler_params (route : Types.route) ~type_namespace =
 
 let gen_endpoint_function_body (route : Types.route) ~type_namespace
     ~handler_namespace =
-  let gen_deserialize_query (query_param_type : Types.route_params) =
+  let gen_deserialize_query (query_param_type : Types.QueryParams.t) =
     match query_param_type with
     | None -> []
     | Fields _ ->
@@ -155,32 +162,39 @@ let gen_route_types ~type_namespace (route : Types.route) =
   | Get s ->
       let query_t =
         if s.query_param_type != None then
-          gen_route_params_type
+          gen_query_param_type
             ~name:(query_param_type_name ~route_name:route.name ~type_namespace)
-            s.query_param_type ~type_namespace ~ppxes:[ "of_yojson"; "query" ]
+            s.query_param_type ~type_namespace ~ppxes:[ "query" ]
         else ""
       in
       let output_t =
-        gen_route_params_type
+        gen_json_body_type
           ~name:(output_type_name ~route_name:route.name ~type_namespace)
           s.output_type ~type_namespace ~ppxes:[ "yojson_of" ]
       in
       [ query_t; output_t ]
   | Post s ->
+      let query_t =
+        if s.query_param_type != None then
+          gen_query_param_type
+            ~name:(query_param_type_name ~route_name:route.name ~type_namespace)
+            s.query_param_type ~type_namespace ~ppxes:[ "query" ]
+        else ""
+      in
       let input_t =
-        gen_route_params_type
+        gen_json_body_type
           ~name:(input_type_name ~route_name:route.name ~type_namespace)
           s.input_type ~type_namespace ~ppxes:[ "of_yojson" ]
       in
       let output_t =
-        gen_route_params_type
+        gen_json_body_type
           ~name:(output_type_name ~route_name:route.name ~type_namespace)
           s.output_type ~type_namespace ~ppxes:[ "yojson_of" ]
       in
-      [ input_t; output_t ]
+      [ query_t; input_t; output_t ]
   | Delete s ->
       let output_t =
-        gen_route_params_type
+        gen_json_body_type
           ~name:(output_type_name ~route_name:route.name ~type_namespace)
           s.output_type ~type_namespace ~ppxes:[ "yojson_of" ]
       in
@@ -188,7 +202,7 @@ let gen_route_types ~type_namespace (route : Types.route) =
 
 let gen_route ~type_namespace ~handler_namespace (route : Types.route) =
   let params =
-    List.map (fun { name; t } -> Format.sprintf "(%s: %s)" name t) route_params
+    List.map (fun { name; t } -> Format.sprintf "(%s: %s)" name t) json_body
   in
   let code =
     Format.sprintf "let %s %s =\n  %s" route.name (String.concat " " params)
