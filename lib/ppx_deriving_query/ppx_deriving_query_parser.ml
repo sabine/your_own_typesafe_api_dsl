@@ -36,7 +36,9 @@ let gen_decode_expr ~loc (ct : core_type) : expression =
         if is_option ct then
           [%expr Option.map [%e evar ~loc (name ^ "_of_string")]]
         else
-          [%expr Option.map [%e evar ~loc (name ^ "_of_string")] |> Option.get]
+          failwith
+            "currently, only optional query fields of types that implement \
+             t_of_string are implemented"
       else [%expr fun id -> id]
 
 let query_parser_impl acc (ld : label_declaration) =

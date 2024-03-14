@@ -113,7 +113,12 @@ module CreateUserOutput = struct
 end
 
 module UsersQuery = struct
-  type t = { name : string; next : int; prev : int; limit : int }
+  type t = {
+    name : string option;
+    next : int option;
+    prev : int option;
+    limit : int option;
+  }
   [@@deriving query]
 end
 
@@ -130,7 +135,7 @@ module DeleteUserOutput = struct
 end
 
 module CreateConversationQuery = struct
-  type t = { user : string } [@@deriving query]
+  type t = { user : string option } [@@deriving query]
 end
 
 module CreateConversationInput = struct

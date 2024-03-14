@@ -45,7 +45,11 @@ module QueryParams = struct
   let field name t = { name; t }
 
   let type_of_value_t (t : value_t) =
-    match t with Str -> str | Float -> f64 | Int -> i63 | StrList -> vec str
+    match t with
+    | Str -> option str
+    | Float -> option f64
+    | Int -> option i63
+    | StrList -> vec str
 
   let struct_field_of_field_t (f : field_t) =
     Gen_types.Types.(field f.name (type_of_value_t f.t))
