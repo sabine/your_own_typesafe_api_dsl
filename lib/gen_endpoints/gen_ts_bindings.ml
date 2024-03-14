@@ -69,10 +69,9 @@ module Route_types = struct
     | None -> Format.sprintf "export type %s = {}" name
 
   let gen_response_type ~route_name =
-    Format.sprintf "export type %s = utils.ApiResponse<%s, %s>;"
+    Format.sprintf "export type %s = utils.ApiResponse<%s>;"
       (response_type_name ~route_name)
       (output_type_name ~route_name)
-      "ResponseError"
 
   let gen_route_types ~type_namespace (route : Types.route) =
     match route.shape with

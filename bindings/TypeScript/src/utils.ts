@@ -2,15 +2,7 @@ import { API_KEY, API_URL, fetch } from "./config";
 
 /* TODO: this entire file is bullshit and needs to be rewritten */
 
-export type ApiResponse<S, E> = S | ApiResponseError<E>;
-type BaseError = {
-    error: true;
-    status: number;
-    body: {
-        title: string;
-        detail: string;
-    };
-};
+export type ApiResponse<S> = S;
 
 type NotFound = {
     type: 'NotFound';
@@ -46,17 +38,16 @@ type InternalError = {
     status: 500;
 };
 
-export type ApiResponseError<E> = BaseError &
+export type ApiResponseError =
     (
         | NotFound
         | NotAuthenticated
         | Forbidden
         | BadRequest
         | InternalError
-        | (E extends Object ? { body: E } : {})
     );
 
-function maker_database_api_fetch(url: string, opts: any): Promise<ApiResponse<any, any>> {
+function maker_database_api_fetch(url: string, opts: any): Promise<ApiResponse<any>> {
     let fetch_url = API_URL + url;
     console.log(['fetch_url', fetch_url]);
     const response = fetch(fetch_url, opts).then(async (res: Response) => {
@@ -94,7 +85,7 @@ export function get(url: string) {
         Accept: 'application/json',
         'Content-Type': 'application/json'
     };
-    if (!API_KEY) throw "api_key is not set via Chattelite.init({.., api_key: YOUR_API_KEY})";
+    if (!API_KEY) throw "api_key is not set via init({.., api_key: YOUR_API_KEY})";
     headers['X-Access-Token'] = API_KEY;
     return maker_database_api_fetch(url, {
         headers
@@ -107,7 +98,7 @@ export function post(url: string, body?: any) {
         Accept: 'application/json',
         'Content-Type': 'application/json'
     };
-    if (!API_KEY) throw "api_key is not set via Chattelite.init({.., api_key: YOUR_API_KEY})";
+    if (!API_KEY) throw "api_key is not set via init({.., api_key: YOUR_API_KEY})";
     headers['X-Access-Token'] = API_KEY;
     return maker_database_api_fetch(url, {
         method: 'POST',
@@ -121,7 +112,7 @@ export function del(url: string) {
         Accept: 'application/json',
         'Content-Type': 'application/json'
     };
-    if (!API_KEY) throw "api_key is not set via Chattelite.init({.., api_key: YOUR_API_KEY})";
+    if (!API_KEY) throw "api_key is not set via init({.., api_key: YOUR_API_KEY})";
     headers['X-Access-Token'] = API_KEY;
     return maker_database_api_fetch(url, {
         method: 'DELETE',

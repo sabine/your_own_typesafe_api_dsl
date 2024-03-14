@@ -1,8 +1,7 @@
 let bad_request msg =
   Dream.json ~code:400 (Format.sprintf "{ \"message\": \"%s\" }" msg)
 
-let not_found =
-  Dream.json ~code:404 (Format.sprintf "{ \"message\": \"%s\" }" "Not found")
+let not_found = Dream.json ~code:404 "{ \"message\": \"Not found\" }"
 
 let internal_error msg =
   Dream.json ~code:500 (Format.sprintf "{ \"message\": \"%s\" }" msg)
