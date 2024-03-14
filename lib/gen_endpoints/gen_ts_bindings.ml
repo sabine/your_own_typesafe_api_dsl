@@ -52,9 +52,6 @@ module Route_types = struct
     | Fields fields ->
         Api_types.gen_type_declaration_for_api_type ~type_namespace
           (Types.struct_ (input_type_name ~route_name) fields)
-    | Structs structs ->
-        Api_types.gen_type_declaration_for_api_type ~type_namespace
-          (Types.struct_union (input_type_name ~route_name) structs)
     | None -> ""
 
   let gen_route_params_type ~name (route_params : Types.route_params)
@@ -63,9 +60,6 @@ module Route_types = struct
     | Fields fields ->
         Api_types.gen_type_declaration_for_api_type ~type_namespace
           (Types.struct_ name fields)
-    | Structs structs ->
-        Api_types.gen_type_declaration_for_api_type ~type_namespace
-          (Types.struct_union name structs)
     | None -> Format.sprintf "export type %s = {}" name
 
   let gen_response_type ~route_name =

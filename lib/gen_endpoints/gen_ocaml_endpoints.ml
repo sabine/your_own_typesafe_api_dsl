@@ -20,11 +20,6 @@ let gen_input_type ~route_name (route_params : Types.route_params)
   | Fields fields ->
       gen_type_declaration_for_api_type ~type_namespace ~ppxes:[ "yojson" ]
         (Types.struct_ (input_type_name ~type_namespace ~route_name) fields)
-  | Structs structs ->
-      gen_type_declaration_for_api_type ~type_namespace ~ppxes:[ "yojson" ]
-        (Types.struct_union
-           (input_type_name ~type_namespace ~route_name)
-           structs)
   | None -> ""
 
 (* query param type *)
@@ -39,9 +34,6 @@ let gen_route_params_type ~name (route_params : Types.route_params)
   | Fields fields ->
       gen_type_declaration_for_api_type ~type_namespace ~ppxes
         (Types.struct_ name fields)
-  | Structs structs ->
-      gen_type_declaration_for_api_type ~type_namespace ~ppxes
-        (Types.struct_union name structs)
   | None ->
       gen_type_declaration_for_api_type ~type_namespace ~ppxes
         Types.(alias (t name) unit)
@@ -109,7 +101,6 @@ let gen_endpoint_function_body (route : Types.route) ~type_namespace
             (query_param_type_name ~route_name:route.name ~type_namespace)
             handler_namespace;
         ]
-    | Structs _ -> failwith "not_implemented"
   in
   let params_of_url_params (url_params : Types.url_param list option) =
     List.map

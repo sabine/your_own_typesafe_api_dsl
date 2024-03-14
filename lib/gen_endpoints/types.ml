@@ -32,10 +32,7 @@ type error_variant = {
   title : string;
 }
 
-type route_params =
-  | Fields of Gen_types.Types.field list
-  | Structs of Gen_types.Types.struct_ list
-  | None
+type route_params = Fields of Gen_types.Types.field list | None
 
 type get_route = {
   url_params : url_params;

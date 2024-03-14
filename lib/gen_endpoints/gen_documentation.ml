@@ -45,7 +45,6 @@ let gen_endpoint_doc (route : Types.route) =
                       (render_type p.field_t))
                   fs);
         ]
-    | _ -> failwith "not implemented"
   in
   let input_type =
     match input_type with
@@ -61,7 +60,6 @@ let gen_endpoint_doc (route : Types.route) =
                       (render_type p.field_t))
                   fs);
         ]
-    | Structs _ -> failwith "not implemented"
   in
 
   let output_type =
@@ -78,7 +76,6 @@ let gen_endpoint_doc (route : Types.route) =
                       (render_type p.field_t))
                   fs);
         ]
-    | Structs _ -> failwith "not implemented"
   in
   let docs = url_params @ query_params @ input_type @ output_type in
 
