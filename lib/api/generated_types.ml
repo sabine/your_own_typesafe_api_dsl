@@ -7,8 +7,16 @@ module UserId = struct
   type t = string [@@deriving yojson]
 end
 
+module UserCursor = struct
+  type t = int [@@deriving yojson]
+end
+
 module ConversationId = struct
   type t = string [@@deriving yojson]
+end
+
+module ConversationCursor = struct
+  type t = int [@@deriving yojson]
 end
 
 module LineId = struct

@@ -1,4 +1,4 @@
-type primitive_type = Str | I32 | I63 | U32 | Bool | Json | F32 | F64 | Unit
+type primitive_type = Str | I63 | Bool | Json | F32 | F64 | Unit
 
 type t =
   | TypeName of string
@@ -39,9 +39,7 @@ module TypeDeclarations = struct
   let field name t = { field_name = name; field_t = t }
   let struct_union_variant name fields = { struct_name = name; fields }
   let str = PrimitiveType Str
-  let i32 = PrimitiveType I32
   let i63 = PrimitiveType I63
-  let u32 = PrimitiveType U32
   let f32 = PrimitiveType F32
   let f64 = PrimitiveType F64
   let bool = PrimitiveType Bool

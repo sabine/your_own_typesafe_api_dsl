@@ -1,8 +1,6 @@
 let rec render_type (t : Types.t) ~type_namespace =
   match t with
   | PrimitiveType Str -> "string"
-  | PrimitiveType I32 -> "int"
-  | PrimitiveType U32 -> "int"
   | PrimitiveType I63 -> "int"
   | PrimitiveType F32 -> "Float32.t"
   | PrimitiveType F64 -> "Float64.t"

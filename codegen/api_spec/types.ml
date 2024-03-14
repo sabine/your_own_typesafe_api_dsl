@@ -13,7 +13,9 @@ let t =
   Gen_endpoints.Types.
     [
       id_type (u T.user_id);
+      alias T.user_cursor i63;
       id_type (u T.conversation_id);
+      alias T.conversation_cursor i63;
       id_type (u T.line_id);
       alias T.date_time str;
     ]
@@ -63,7 +65,7 @@ let ot =
         [
           field "conversation_id" T.conversation_id;
           field "timestamp" T.date_time;
-          field "number_of_unread_messages" i32;
+          field "number_of_unread_messages" i63;
           field "newest_line" (nullable Ot.line);
         ];
       paginate Ot.paginated_conversations Ot.conversation T.conversation_cursor;

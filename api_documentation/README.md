@@ -6,9 +6,17 @@
 
 is an ID type (String)
 
+## <a name="UserCursor">UserCursor</a>
+
+  is an alias for 63-bit Integer
+
 ## ConversationId
 
 is an ID type (String)
+
+## <a name="ConversationCursor">ConversationCursor</a>
+
+  is an alias for 63-bit Integer
 
 ## LineId
 
@@ -112,7 +120,7 @@ is a struct with these fields:
 |-|-|
 |conversation_id|[ConversationId](#ConversationId)|
 |timestamp|[DateTime](#DateTime)|
-|number_of_unread_messages|32-bit Integer|
+|number_of_unread_messages|63-bit Integer|
 |newest_line|Nullable ([Line](#Line))|
 
 ## <a name="PaginatedConversations">PaginatedConversations</a>
@@ -155,7 +163,7 @@ Query Parameters:
   |name|Optional (String)|
   |next|Optional ([UserCursor](#UserCursor))|
   |prev|Optional ([UserCursor](#UserCursor))|
-  |limit|Optional (32-bit Integer)|
+  |limit|Optional (63-bit Integer)|
 
 Response body:
   |name|type|
