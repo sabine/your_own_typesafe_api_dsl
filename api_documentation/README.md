@@ -6,17 +6,9 @@
 
 is an ID type (String)
 
-## <a name="UserCursor">UserCursor</a>
-
-  is an alias for 63-bit Integer
-
 ## ConversationId
 
 is an ID type (String)
-
-## <a name="ConversationCursor">ConversationCursor</a>
-
-  is an alias for 63-bit Integer
 
 ## LineId
 
@@ -28,30 +20,19 @@ is an ID type (String)
 
 ## <a name="User">User</a>
 
-  is one of these variants:
-
-* `UserMember`
-
-|field_name|type|
+is a struct with these fields:
+|name|type|
 |-|-|
 |display_name|String|
 |user_id|[UserId](#UserId)|
-
-* `UserAdmin`
-
-|field_name|type|
-|-|-|
-|display_name|String|
-|user_id|[UserId](#UserId)|
-
 
 ## <a name="PaginatedUsers">PaginatedUsers</a>
 
 is a struct with these fields:
 |name|type|
 |-|-|
-|next|Optional ([UserCursor](#UserCursor))|
-|prev|Optional ([UserCursor](#UserCursor))|
+|next|Optional ([UserId](#UserId))|
+|prev|Optional ([UserId](#UserId))|
 |objs|Array of ([User](#User))|
 
 ## <a name="ParentLine">ParentLine</a>
@@ -139,8 +120,8 @@ is a struct with these fields:
 is a struct with these fields:
 |name|type|
 |-|-|
-|next|Optional ([ConversationCursor](#ConversationCursor))|
-|prev|Optional ([ConversationCursor](#ConversationCursor))|
+|next|Optional ([ConversationId](#ConversationId))|
+|prev|Optional ([ConversationId](#ConversationId))|
 |objs|Array of ([Conversation](#Conversation))|
 
 # Endpoints

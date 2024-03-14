@@ -9,7 +9,7 @@ let rec message_loop () =
              {
                line_id = "TODO";
                timestamp = "TODO";
-               from = UserMember { user_id = "TODO"; display_name = "TODO" };
+               from = { user_id = "TODO"; display_name = "TODO" };
                message = "TODO";
                data = "";
                reply_to_line = None;

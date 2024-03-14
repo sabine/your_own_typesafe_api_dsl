@@ -13,9 +13,7 @@ let t =
   Gen_endpoints.Types.
     [
       id_type (u T.user_id);
-      alias T.user_cursor i63;
       id_type (u T.conversation_id);
-      alias T.conversation_cursor i63;
       id_type (u T.line_id);
       alias T.date_time str;
     ]
@@ -25,14 +23,16 @@ let it = []
 let ot =
   Gen_endpoints.Types.
     [
-      struct_union (u Ot.user)
-        [
-          struct_union_variant "Member"
-            [ field "display_name" str; field "user_id" T.user_id ];
-          struct_union_variant "Admin"
-            [ field "display_name" str; field "user_id" T.user_id ];
-        ];
-      paginate Ot.paginated_users Ot.user T.user_cursor;
+      struct_ (u Ot.user)
+        [ field "display_name" str; field "user_id" T.user_id ];
+      (* struct_union (u Ot.user)
+         [
+           struct_union_variant "Member"
+             [ field "display_name" str; field "user_id" T.user_id ];
+           struct_union_variant "Admin"
+             [ field "display_name" str; field "user_id" T.user_id ];
+         ]; *)
+      paginate Ot.paginated_users Ot.user T.user_id;
       struct_ (u Ot.parent_line)
         [
           field "line_id" T.line_id;
@@ -73,5 +73,5 @@ let ot =
           field "number_of_unread_messages" i63;
           field "newest_line" (nullable Ot.line);
         ];
-      paginate Ot.paginated_conversations Ot.conversation T.conversation_cursor;
+      paginate Ot.paginated_conversations Ot.conversation T.conversation_id;
     ]

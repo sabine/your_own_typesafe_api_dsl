@@ -44,18 +44,14 @@ module Server = struct
              T.GetUserOutput.
                {
                  user =
-                   UserMember
-                     {
-                       user_id = user.user_id;
-                       display_name = user.display_name;
-                     };
+                   { user_id = user.user_id; display_name = user.display_name };
                })
 
   let users _req (_query : T.UsersQuery.t) =
     let users =
       UsersSet.to_list !users_state
       |> List.map (fun User.{ user_id; display_name } ->
-             T.User.UserMember { user_id; display_name })
+             T.User.{ user_id; display_name })
     in
 
     Lwt.return
