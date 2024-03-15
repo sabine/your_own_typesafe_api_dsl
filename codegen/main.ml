@@ -75,8 +75,8 @@ let () =
   let open Api_spec.Endpoints in
   (* backend endpoints *)
   gen_ocaml_endpoints ~t ~it ~ot ~endpoints
-    ~types_output_path:"lib/api/generated_types.ml"
-    ~endpoints_output_path:"lib/api/generated_endpoints.ml"
+    ~types_output_path:"backend/api/generated_types.ml"
+    ~endpoints_output_path:"backend/api/generated_endpoints.ml"
     ~type_namespace:"Generated_types." ~handler_namespace:"Handlers.Server.";
 
   gen_documentation ~t ~it ~ot ~endpoints

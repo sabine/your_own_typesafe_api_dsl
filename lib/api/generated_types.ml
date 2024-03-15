@@ -5,233 +5,156 @@ open Ppx_yojson_conv_lib.Yojson_conv
 (* API input and output types *)
 module UserId = struct
   type t = string [@@deriving yojson]
-
 end
 
 module ConversationId = struct
   type t = string [@@deriving yojson]
-
 end
 
 module LineId = struct
   type t = string [@@deriving yojson]
-
 end
 
 module DateTime = struct
   type t = string [@@deriving yojson]
-  
 end
 
 (* API input types *)
 
-
 (* API output types *)
 module User = struct
-  type t = {
-    display_name: string;
-    user_id: UserId.t
-} [@@deriving yojson]
-  
+  type t = { display_name : string; user_id : UserId.t } [@@deriving yojson]
 end
 
 module PaginatedUsers = struct
   type t = {
-    next: (UserId.t) option;
-    prev: (UserId.t) option;
-    objs: (User.t) list
-} [@@deriving yojson]
-  
+    next : UserId.t option;
+    prev : UserId.t option;
+    objs : User.t list;
+  }
+  [@@deriving yojson]
 end
 
 module ParentLine = struct
   type t = {
-    line_id: LineId.t;
-    timestamp: DateTime.t;
-    from: User.t;
-    message: string;
-    data: string
-} [@@deriving yojson]
-  
+    line_id : LineId.t;
+    timestamp : DateTime.t;
+    from : User.t;
+    message : string;
+    data : string;
+  }
+  [@@deriving yojson]
 end
 
 module Line = struct
   type t = {
-    line_id: LineId.t;
-    timestamp: DateTime.t;
-    from: User.t;
-    message: string;
-    data: string;
-    reply_to_line: (LineId.t) option
-} [@@deriving yojson]
-  
+    line_id : LineId.t;
+    timestamp : DateTime.t;
+    from : User.t;
+    message : string;
+    data : string;
+    reply_to_line : LineId.t option;
+  }
+  [@@deriving yojson]
 end
 
 module Thread = struct
-  type t = {
-    line: Line.t;
-    replies: (Line.t) list
-} [@@deriving yojson]
-  
+  type t = { line : Line.t; replies : Line.t list } [@@deriving yojson]
 end
 
 module ConversationEvent = struct
   type t =
-    | ConversationEventNewLine of {
-  line: Line.t
-}
-
-    | ConversationEventJoin of {
-  timestamp: DateTime.t;
-  from: User.t
-}
-
-    | ConversationEventLeave of {
-  timestamp: DateTime.t;
-  from: User.t
-}
-
-    | ConversationEventStartTyping of {
-  timestamp: DateTime.t;
-  from: User.t
-}
-
-    | ConversationEventEndTyping of {
-  timestamp: DateTime.t;
-  from: User.t
-}
- [@@deriving yojson]
-  
+    | ConversationEventNewLine of { line : Line.t }
+    | ConversationEventJoin of { timestamp : DateTime.t; from : User.t }
+    | ConversationEventLeave of { timestamp : DateTime.t; from : User.t }
+    | ConversationEventStartTyping of { timestamp : DateTime.t; from : User.t }
+    | ConversationEventEndTyping of { timestamp : DateTime.t; from : User.t }
+  [@@deriving yojson]
 end
 
 module Conversation = struct
   type t = {
-    conversation_id: ConversationId.t;
-    timestamp: DateTime.t;
-    number_of_unread_messages: int;
-    newest_line: (Line.t) option
-} [@@deriving yojson]
-  
+    conversation_id : ConversationId.t;
+    timestamp : DateTime.t;
+    number_of_unread_messages : int;
+    newest_line : Line.t option;
+  }
+  [@@deriving yojson]
 end
 
 module PaginatedConversations = struct
   type t = {
-    next: (ConversationId.t) option;
-    prev: (ConversationId.t) option;
-    objs: (Conversation.t) list
-} [@@deriving yojson]
-  
+    next : ConversationId.t option;
+    prev : ConversationId.t option;
+    objs : Conversation.t list;
+  }
+  [@@deriving yojson]
 end
 
 (* endpoint types *)
 
-
 module CreateUserInput = struct
-  type t = {
-    display_name: string;
-    user_id: UserId.t
-} [@@deriving of_yojson]
-  
+  type t = { display_name : string; user_id : UserId.t } [@@deriving of_yojson]
 end
 
 module CreateUserOutput = struct
-  type t = {
-    user_id: UserId.t
-} [@@deriving yojson_of]
-  
+  type t = { user_id : UserId.t } [@@deriving yojson_of]
 end
 
 module UsersQuery = struct
   type t = {
-    name: (string) option;
-    next: (int) option;
-    prev: (int) option;
-    limit: (int) option
-} [@@deriving query]
-  
+    name : string option;
+    next : int option;
+    prev : int option;
+    limit : int option;
+  }
+  [@@deriving query]
 end
 
 module UsersOutput = struct
-  type t = {
-    users: PaginatedUsers.t
-} [@@deriving yojson_of]
-  
+  type t = { users : PaginatedUsers.t } [@@deriving yojson_of]
 end
 
-
-
 module GetUserOutput = struct
-  type t = {
-    user: User.t
-} [@@deriving yojson_of]
-  
+  type t = { user : User.t } [@@deriving yojson_of]
 end
 
 module DeleteUserOutput = struct
   type t = unit [@@deriving yojson_of]
-  
 end
 
 module CreateConversationQuery = struct
-  type t = {
-    user: (string) option
-} [@@deriving query]
-  
+  type t = { user : string option } [@@deriving query]
 end
 
 module CreateConversationInput = struct
-  type t = {
-    user_ids: (UserId.t) list;
-    data: string
-} [@@deriving of_yojson]
-  
+  type t = { user_ids : UserId.t list; data : string } [@@deriving of_yojson]
 end
 
 module CreateConversationOutput = struct
-  type t = {
-    conversation_id: ConversationId.t
-} [@@deriving yojson_of]
-  
+  type t = { conversation_id : ConversationId.t } [@@deriving yojson_of]
 end
 
-
-
 module UpdateConversationInput = struct
-  type t = {
-    data: string
-} [@@deriving of_yojson]
-  
+  type t = { data : string } [@@deriving of_yojson]
 end
 
 module UpdateConversationOutput = struct
   type t = unit [@@deriving yojson_of]
-  
 end
 
-
-
 module AddUsersToConversationInput = struct
-  type t = {
-    user_ids: (UserId.t) list
-} [@@deriving of_yojson]
-  
+  type t = { user_ids : UserId.t list } [@@deriving of_yojson]
 end
 
 module AddUsersToConversationOutput = struct
   type t = unit [@@deriving yojson_of]
-  
 end
 
-
-
 module RemoveUsersFromConversationInput = struct
-  type t = {
-    user_ids: (UserId.t) list
-} [@@deriving of_yojson]
-  
+  type t = { user_ids : UserId.t list } [@@deriving of_yojson]
 end
 
 module RemoveUsersFromConversationOutput = struct
   type t = unit [@@deriving yojson_of]
-  
 end

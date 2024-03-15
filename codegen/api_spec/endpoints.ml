@@ -3,47 +3,25 @@ open T
 let endpoints =
   Gen_endpoints.Types.
     [
-      {
-        name = "create_user";
-        url = "/users";
-        docstring = "create a new user";
-        shape =
-          Post
-            {
-              url_params = None;
-              input_type =
-                Fields [ field "display_name" str; field "user_id" T.user_id ];
-                (* Fields
-                  [
-                    field "display_name" str;
-                    field "user_id" T.user_id;
-                    field "recruited_by" T.user_id;
-                  ]; *)
-              query_param_type = None;
-              output_type = Fields [ field "user_id" T.user_id ];
-              error_type = None;
-            };
-      };
-      {
-        name = "users";
-        url = "/users";
-        docstring = "list users";
-        shape =
-          Get
-            {
-              url_params = None;
-              query_param_type =
-                Fields
-                  QueryParams.
-                    [
-                      field "name" Str;
-                      field "next" Int;
-                      field "prev" Int;
-                      field "limit" Int;
-                    ];
-              output_type = Fields [ field "users" Ot.paginated_users ];
-            };
-      };
+      post ~name:"create_user" ~path:"/users"
+        ~input_type:[ field "display_name" str; field "user_id" T.user_id ]
+          (* ~input_type:([
+             field "display_name" str;
+             field "user_id" T.user_id;
+             field "recruited_by" T.user_id; ]) *)
+        ~output_type:[ field "user_id" T.user_id ]
+        ();
+      get ~name:"users" ~path:"/users"
+        ~query_params:
+          QueryParams.
+            [
+              field "name" Str;
+              field "next" Int;
+              field "prev" Int;
+              field "limit" Int;
+            ]
+        ~output_type:[ field "users" Ot.paginated_users ]
+        ();
       {
         name = "get_user";
         url = "/user/{user_id}";

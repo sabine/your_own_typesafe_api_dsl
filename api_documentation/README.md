@@ -128,7 +128,7 @@ is a struct with these fields:
 
 ## <a name="create_user">create_user</a>
 
-create a new user
+
 
 POST /users
 
@@ -145,7 +145,7 @@ Response body:
 
 ## <a name="users">users</a>
 
-list users
+
 
 GET /users
 

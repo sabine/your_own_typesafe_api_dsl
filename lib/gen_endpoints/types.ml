@@ -91,3 +91,49 @@ type route = {
   docstring : string;
   shape : route_shape;
 }
+
+let get ~name ~path ?(url_params = None) ?(query_params = []) ~output_type () =
+  {
+    name;
+    url = path;
+    docstring = "";
+    shape =
+      Get
+        {
+          url_params;
+          query_param_type =
+            (if List.length query_params > 0 then
+               QueryParams.Fields query_params
+             else QueryParams.None);
+          output_type = Fields output_type;
+        };
+  }
+
+let post ~name ~path ?(url_params = None) ?(query_params = []) ~input_type
+    ~output_type () =
+  {
+    name;
+    url = path;
+    docstring = "";
+    shape =
+      Post
+        {
+          url_params;
+          query_param_type =
+            (if List.length query_params > 0 then
+               QueryParams.Fields query_params
+             else QueryParams.None);
+          input_type = Fields input_type;
+          output_type = Fields output_type;
+          error_type = None;
+        };
+  }
+
+let delete ~name ~path ?(url_params = None) ~output_type () =
+  {
+    name;
+    url = path;
+    docstring = "";
+    shape =
+      Delete { url_params; output_type = Fields output_type; error_type = None };
+  }

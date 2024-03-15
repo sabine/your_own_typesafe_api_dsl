@@ -22,7 +22,7 @@ install: all ## Install the packages on the system
 
 .PHONY: start
 start: all ## Run the produced executable
-	opam exec -- dune exec app/main.exe
+	opam exec -- dune exec backend/main.exe
 
 .PHONY: test
 test: ## Run the unit tests
