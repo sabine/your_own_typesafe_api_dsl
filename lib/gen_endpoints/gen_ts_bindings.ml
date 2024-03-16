@@ -2,31 +2,31 @@
 
 (* names of generated types *)
 
-let input_type_name ~route_name =
-  Format.sprintf "%sInput" (Gen_types.Names.to_pascal_case route_name)
+let input_name ~endpoint_name =
+  Format.sprintf "%sInput" (Gen_types.Names.to_pascal_case endpoint_name)
 
-let query_param_type_name ~route_name =
-  Format.sprintf "%sQuery" (Gen_types.Names.to_pascal_case route_name)
+let query_params_name ~endpoint_name =
+  Format.sprintf "%sQuery" (Gen_types.Names.to_pascal_case endpoint_name)
 
-let output_type_name ~route_name =
-  Format.sprintf "%sOutput" (Gen_types.Names.to_pascal_case route_name)
+let output_name ~endpoint_name =
+  Format.sprintf "%sOutput" (Gen_types.Names.to_pascal_case endpoint_name)
 
-let response_type_name ~route_name =
-  Format.sprintf "%sResponse" (Gen_types.Names.to_pascal_case route_name)
+let response_type_name ~endpoint_name =
+  Format.sprintf "%sResponse" (Gen_types.Names.to_pascal_case endpoint_name)
 
 module Api_types = struct
   let gen_type_declaration_for_api_type ~type_namespace
-      (decl : Types.type_declaration) =
+      (decl : Ast.type_declaration) =
     match decl with
     | BasicTypeDecl decl ->
         Gen_types.Gen_typescript.gen_type_declaration ~type_namespace decl
     | IdType name ->
         Gen_types.(
           Gen_typescript.gen_type_declaration ~type_namespace
-            Types.(alias (t name) str))
+            Dsl.(alias (TypeName.of_string name) str))
 
-  let gen_types ~(t : Types.type_declaration list)
-      ~(it : Types.type_declaration list) ~(ot : Types.type_declaration list)
+  let gen_types ~(t : Ast.type_declaration list)
+      ~(it : Ast.type_declaration list) ~(ot : Ast.type_declaration list)
       ~type_namespace =
     Format.sprintf
       "// API input and output types\n\
@@ -45,149 +45,156 @@ end
 
 let gen_types = Api_types.gen_types
 
-module Route_types = struct
-  let gen_input_type ~route_name (route_params : Types.JsonBody.t)
+module Endpoint_types = struct
+  let gen_input ~endpoint_name (endpoint_params : Ast.JsonBody.t)
       ~type_namespace =
-    match route_params with
-    | Fields fields ->
+    match endpoint_params with
+    | [] -> ""
+    | _ ->
         Api_types.gen_type_declaration_for_api_type ~type_namespace
-          (Types.struct_ (input_type_name ~route_name) fields)
-    | None -> ""
+          (Dsl.record (input_name ~endpoint_name) endpoint_params)
 
-  let gen_route_params_type ~name (route_params : Types.JsonBody.t)
+  let gen_endpoint_params_type ~name (endpoint_params : Ast.JsonBody.t)
       ~type_namespace =
-    match route_params with
-    | Fields fields ->
+    match endpoint_params with
+    | [] -> Format.sprintf "export type %s = {}" name
+    | _ ->
         Api_types.gen_type_declaration_for_api_type ~type_namespace
-          (Types.struct_ name fields)
-    | None -> Format.sprintf "export type %s = {}" name
+          (Dsl.record name endpoint_params)
 
-  let gen_query_params_type ~name (query_params : Types.QueryParams.t)
+  let gen_query_params_type ~name (query_params : Ast.QueryParams.t)
       ~type_namespace =
     match query_params with
-    | Fields _ ->
+    | [] -> Format.sprintf "export type %s = {}" name
+    | _ ->
         Api_types.gen_type_declaration_for_api_type ~type_namespace
-          (Types.QueryParams.struct_of_t name query_params)
-    | None -> Format.sprintf "export type %s = {}" name
+          (BasicTypeDecl (Ast.QueryParams.record_of_t name query_params))
 
-  let gen_response_type ~route_name =
+  let gen_response_type ~endpoint_name =
     Format.sprintf "export type %s = utils.ApiResponse<%s>;"
-      (response_type_name ~route_name)
-      (output_type_name ~route_name)
+      (response_type_name ~endpoint_name)
+      (output_name ~endpoint_name)
 
-  let gen_route_types ~type_namespace (route : Types.route) =
-    match route.shape with
+  let gen_endpoint_types ~type_namespace (endpoint : Ast.endpoint) =
+    match endpoint.shape with
     | Get s ->
         let output_t =
-          gen_route_params_type
-            ~name:(output_type_name ~route_name:route.name)
-            s.output_type ~type_namespace
+          gen_endpoint_params_type
+            ~name:(output_name ~endpoint_name:endpoint.name)
+            s.output ~type_namespace
         in
         let query_t =
-          if s.query_param_type != None then
-            [
-              gen_query_params_type
-                ~name:(query_param_type_name ~route_name:route.name)
-                s.query_param_type ~type_namespace;
-            ]
-          else []
+          match s.query_params with
+          | [] -> []
+          | _ ->
+              [
+                gen_query_params_type
+                  ~name:(query_params_name ~endpoint_name:endpoint.name)
+                  s.query_params ~type_namespace;
+              ]
         in
+
         query_t @ [ output_t ]
     | Post s ->
         let input_t =
-          gen_route_params_type
-            ~name:(input_type_name ~route_name:route.name)
-            s.input_type ~type_namespace
+          gen_endpoint_params_type
+            ~name:(input_name ~endpoint_name:endpoint.name)
+            s.input ~type_namespace
         in
         let output_t =
-          gen_route_params_type
-            ~name:(output_type_name ~route_name:route.name)
-            s.output_type ~type_namespace
+          gen_endpoint_params_type
+            ~name:(output_name ~endpoint_name:endpoint.name)
+            s.output ~type_namespace
         in
         let query_t =
-          if s.query_param_type != None then
-            [
-              gen_query_params_type
-                ~name:(query_param_type_name ~route_name:route.name)
-                s.query_param_type ~type_namespace;
-            ]
-          else []
+          match s.query_params with
+          | [] -> []
+          | _ ->
+              [
+                gen_query_params_type
+                  ~name:(query_params_name ~endpoint_name:endpoint.name)
+                  s.query_params ~type_namespace;
+              ]
         in
+
         query_t @ [ input_t; output_t ]
     | Delete s ->
         let output_t =
-          gen_route_params_type
-            ~name:(output_type_name ~route_name:route.name)
-            s.output_type ~type_namespace
+          gen_endpoint_params_type
+            ~name:(output_name ~endpoint_name:endpoint.name)
+            s.output ~type_namespace
         in
         [ output_t ]
 end
 
-module Route_code = struct
-  type route_param = { name : string; t : string }
+module Endpoint_code = struct
+  type endpoint_param = { name : string; t : string }
 
-  let signature_route_params (route : Types.route) ~type_namespace =
-    let params_of_url_params (url_params : Types.url_param list option) =
+  let signature_endpoint_params (endpoint : Ast.endpoint) ~type_namespace =
+    let params_of_url_params (url_params : Ast.UrlParams.t) =
       List.map
-        (fun ({ name; t } : Types.url_param) ->
+        (fun ({ name; t } : Ast.UrlParams.param) ->
           { name; t = Gen_types.Gen_typescript.render_type t ~type_namespace })
-        (Option.value ~default:[] url_params)
+        url_params
     in
 
-    let params_of_query_param_type (query_param_type : Types.QueryParams.t) =
-      match query_param_type with
-      | None -> []
+    let params_of_query_params (query_params : Ast.QueryParams.t) =
+      match query_params with
+      | [] -> []
       | _ ->
           [
             {
               name = "q";
-              t = type_namespace ^ query_param_type_name ~route_name:route.name;
+              t =
+                type_namespace ^ query_params_name ~endpoint_name:endpoint.name;
             };
           ]
     in
-    match route.shape with
-    | Get { url_params; query_param_type; _ } ->
+    match endpoint.shape with
+    | Get { url_params; query_params; _ } ->
+        params_of_url_params url_params @ params_of_query_params query_params
+    | Post { url_params; input; query_params; _ } -> (
         params_of_url_params url_params
-        @ params_of_query_param_type query_param_type
-    | Post { url_params; input_type; query_param_type; _ } ->
-        params_of_url_params url_params
-        @ params_of_query_param_type query_param_type
+        @ params_of_query_params query_params
         @
-        if input_type != None then
-          [
-            {
-              name = "body";
-              t = type_namespace ^ input_type_name ~route_name:route.name;
-            };
-          ]
-        else []
+        match input with
+        | [] -> []
+        | _ ->
+            [
+              {
+                name = "body";
+                t = type_namespace ^ input_name ~endpoint_name:endpoint.name;
+              };
+            ])
     | Delete { url_params; _ } -> params_of_url_params url_params
 
-  let utils_call_route_params (route : Types.route) =
-    match route.shape with
+  let utils_call_endpoint_params (endpoint : Ast.endpoint) =
+    match endpoint.shape with
     | Get _ -> []
-    | Post { input_type; _ } -> if input_type != None then [ "body" ] else []
+    | Post { input; _ } -> if List.length input > 0 then [ "body" ] else []
     | Delete _ -> []
 
-  let gen_route_function_body (route : Types.route) =
+  let gen_endpoint_function_body (endpoint : Ast.endpoint) =
     let url =
       let re = Str.regexp "{" in
-      Str.global_replace re "${" route.url
+      Str.global_replace re "${" endpoint.path
     in
     let url =
-      match route.shape with
-      | Get { query_param_type; _ } ->
-          if query_param_type != None then url ^ "${utils.stringify_query(q)}"
+      match endpoint.shape with
+      | Get { query_params; _ } ->
+          if List.length query_params > 0 then
+            url ^ "${utils.stringify_query(q)}"
           else url
-      | Post { query_param_type; _ } ->
-          if query_param_type != None then url ^ "${utils.stringify_query(q)}"
+      | Post { query_params; _ } ->
+          if List.length query_params > 0 then
+            url ^ "${utils.stringify_query(q)}"
           else url
       | _ -> url
     in
     let params =
-      [ Format.sprintf "`%s`" url ] @ utils_call_route_params route
+      [ Format.sprintf "`%s`" url ] @ utils_call_endpoint_params endpoint
     in
-    match route.shape with
+    match endpoint.shape with
     | Get _ ->
         Format.sprintf "return utils.get(%s);" (String.concat ", " params)
     | Post _ ->
@@ -196,35 +203,36 @@ module Route_code = struct
         Format.sprintf "return utils.del(%s);" (String.concat ", " params)
 end
 
-type gen_route_result = { types : string list; code : string }
+type gen_endpoint_result = { types : string list; code : string }
 
-let gen_route ~type_namespace (route : Types.route) =
+let gen_endpoint ~type_namespace (endpoint : Ast.endpoint) =
   let types =
-    Route_types.gen_route_types route ~type_namespace
-    @ [ Route_types.gen_response_type ~route_name:route.name ]
+    Endpoint_types.gen_endpoint_types endpoint ~type_namespace
+    @ [ Endpoint_types.gen_response_type ~endpoint_name:endpoint.name ]
   in
 
   let params =
     List.map
-      (fun Route_code.{ name; t } -> Format.sprintf "%s: %s" name t)
-      (Route_code.signature_route_params route ~type_namespace)
+      (fun Endpoint_code.{ name; t } -> Format.sprintf "%s: %s" name t)
+      (Endpoint_code.signature_endpoint_params endpoint ~type_namespace)
   in
   let code =
     Format.sprintf {|export function %s(%s): Promise<%s> {
   %s
-}|} route.name
+}|}
+      endpoint.name
       (String.concat ",\n    " params)
-      (type_namespace ^ response_type_name ~route_name:route.name)
-      (Route_code.gen_route_function_body route)
+      (type_namespace ^ response_type_name ~endpoint_name:endpoint.name)
+      (Endpoint_code.gen_endpoint_function_body endpoint)
   in
 
   { types; code }
 
-let gen_routes ~type_namespace (routes : Types.route list) =
+let gen_endpoints ~type_namespace (routes : Ast.endpoint list) =
   let result =
     List.fold_left
-      (fun { types; code } route ->
-        let result = gen_route ~type_namespace route in
+      (fun { types; code } endpoint ->
+        let result = gen_endpoint ~type_namespace endpoint in
         {
           types = List.concat [ types; result.types ];
           code = code ^ "\n\n" ^ result.code;

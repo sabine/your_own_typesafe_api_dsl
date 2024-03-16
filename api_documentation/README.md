@@ -31,8 +31,8 @@ is a struct with these fields:
 is a struct with these fields:
 |name|type|
 |-|-|
-|next|Optional ([UserId](#UserId))|
-|prev|Optional ([UserId](#UserId))|
+|next|Nullable ([UserId](#UserId))|
+|prev|Nullable ([UserId](#UserId))|
 |objs|Array of ([User](#User))|
 
 ## <a name="ParentLine">ParentLine</a>
@@ -120,8 +120,8 @@ is a struct with these fields:
 is a struct with these fields:
 |name|type|
 |-|-|
-|next|Optional ([ConversationId](#ConversationId))|
-|prev|Optional ([ConversationId](#ConversationId))|
+|next|Nullable ([ConversationId](#ConversationId))|
+|prev|Nullable ([ConversationId](#ConversationId))|
 |objs|Array of ([Conversation](#Conversation))|
 
 # Endpoints
@@ -137,6 +137,7 @@ Input body:
   |-|-|
   |display_name|String|
   |user_id|[UserId](#UserId)|
+  |recruited_by|[UserId](#UserId)|
 
 Response body:
   |name|type|
@@ -194,11 +195,6 @@ URL params:
 create a new conversation
 
 POST /converations
-
-Query Parameters:
-  |name|type|
-  |-|-|
-  |user|string|
 
 Input body:
   |name|type|

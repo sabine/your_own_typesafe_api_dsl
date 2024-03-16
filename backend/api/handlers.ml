@@ -22,9 +22,10 @@ module Server = struct
 
   let users_state = ref UsersSet.empty
 
-  let create_user _req ({ user_id; display_name } : T.CreateUserInput.t) =
+  let create_user _req
+      ({ user_id; display_name; recruited_by } : T.CreateUserInput.t) =
     let new_user = User.{ user_id; display_name } in
-    (* let _ = recruited_by in *)
+    let _ = recruited_by in
     match UsersSet.find_opt new_user !users_state with
     | Some _ ->
         Lwt.return
@@ -68,7 +69,7 @@ module Server = struct
         users_state := UsersSet.remove user !users_state;
         Lwt.return (Ok ())
 
-  let create_conversation _req _query (_body : T.CreateConversationInput.t) =
+  let create_conversation _req (_body : T.CreateConversationInput.t) =
     failwith "not_implemented"
   (*Lwt.return T.CreateConversationOutput.{ conversation_id }*)
 

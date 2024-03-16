@@ -12,7 +12,7 @@ let write_to_file path content =
 let gen_typescript_bindings ~t ~it ~ot ~endpoints ~types_output_path
     ~endpoints_output_path =
   let Gen_endpoints.Gen_ts_bindings.{ types; code } =
-    Gen_endpoints.Gen_ts_bindings.gen_routes ~type_namespace:"T." endpoints
+    Gen_endpoints.Gen_ts_bindings.gen_endpoints ~type_namespace:"T." endpoints
   in
   let ts_types =
     Gen_endpoints.Gen_ts_bindings.gen_types ~type_namespace:"" ~t ~it ~ot
@@ -43,7 +43,7 @@ let gen_ocaml_endpoints ~t ~it ~ot ~endpoints ~types_output_path
       endpoints
   in
   let ocaml_endpoints =
-    Gen_endpoints.Gen_ocaml_endpoints.gen_routes ~type_namespace
+    Gen_endpoints.Gen_ocaml_endpoints.gen_endpoints ~type_namespace
       ~handler_namespace endpoints
   in
 

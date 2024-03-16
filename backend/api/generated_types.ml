@@ -94,7 +94,12 @@ end
 (* endpoint types *)
 
 module CreateUserInput = struct
-  type t = { display_name : string; user_id : UserId.t } [@@deriving of_yojson]
+  type t = {
+    display_name : string;
+    user_id : UserId.t;
+    recruited_by : UserId.t;
+  }
+  [@@deriving of_yojson]
 end
 
 module CreateUserOutput = struct
@@ -121,10 +126,6 @@ end
 
 module DeleteUserOutput = struct
   type t = unit [@@deriving yojson_of]
-end
-
-module CreateConversationQuery = struct
-  type t = { user : string option } [@@deriving query]
 end
 
 module CreateConversationInput = struct

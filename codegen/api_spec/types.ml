@@ -1,32 +1,34 @@
 open T
 
 let paginate name obj_t cursor_t =
-  Gen_endpoints.Types.(
-    struct_ (u name)
+  Gen_endpoints.Dsl.(
+    record (TypeName.to_string name)
       [
-        field "next" (option cursor_t);
-        field "prev" (option cursor_t);
-        field "objs" (vec obj_t);
+        field "next" (nullable cursor_t);
+        field "prev" (nullable cursor_t);
+        field "objs" (array obj_t);
       ])
 
 let t =
-  Gen_endpoints.Types.
+  Gen_endpoints.Dsl.
     [
-      id_type (u T.user_id);
-      id_type (u T.conversation_id);
-      id_type (u T.line_id);
+      id_type (TypeName.to_string T.user_id);
+      id_type (TypeName.to_string T.conversation_id);
+      id_type (TypeName.to_string T.line_id);
       alias T.date_time str;
     ]
 
 let it = []
 
 let ot =
-  Gen_endpoints.Types.
+  Gen_endpoints.Dsl.
     [
-      struct_ (u Ot.user)
+      record
+        (TypeName.to_string Ot.user)
         [ field "display_name" str; field "user_id" T.user_id ];
       paginate Ot.paginated_users Ot.user T.user_id;
-      struct_ (u Ot.parent_line)
+      record
+        (TypeName.to_string Ot.parent_line)
         [
           field "line_id" T.line_id;
           field "timestamp" T.date_time;
@@ -35,7 +37,8 @@ let ot =
           field "data" str;
           (* JSON *)
         ];
-      struct_ (u Ot.line)
+      record
+        (TypeName.to_string Ot.line)
         [
           field "line_id" T.line_id;
           field "timestamp" T.date_time;
@@ -45,21 +48,24 @@ let ot =
           (* JSON *)
           field "reply_to_line" (nullable T.line_id);
         ];
-      struct_ (u Ot.thread)
-        [ field "line" Ot.line; field "replies" (vec Ot.line) ];
-      struct_union (u Ot.conversation_event)
+      record
+        (TypeName.to_string Ot.thread)
+        [ field "line" Ot.line; field "replies" (array Ot.line) ];
+      record_union
+        (TypeName.to_string Ot.conversation_event)
         [
-          struct_union_variant "NewLine" [ field "line" Ot.line ];
-          struct_union_variant "Join"
+          record_union_variant "NewLine" [ field "line" Ot.line ];
+          record_union_variant "Join"
             [ field "timestamp" T.date_time; field "from" Ot.user ];
-          struct_union_variant "Leave"
+          record_union_variant "Leave"
             [ field "timestamp" T.date_time; field "from" Ot.user ];
-          struct_union_variant "StartTyping"
+          record_union_variant "StartTyping"
             [ field "timestamp" T.date_time; field "from" Ot.user ];
-          struct_union_variant "EndTyping"
+          record_union_variant "EndTyping"
             [ field "timestamp" T.date_time; field "from" Ot.user ];
         ];
-      struct_ (u Ot.conversation)
+      record
+        (TypeName.to_string Ot.conversation)
         [
           field "conversation_id" T.conversation_id;
           field "timestamp" T.date_time;

@@ -56,25 +56,22 @@ let delete_user (req : Dream.request) =
   | Error response -> response
 
 let create_conversation (req : Dream.request) =
-  match Generated_types.CreateConversationQuery.parse_query req with
-  | Error msg -> Handlers.Server.bad_request msg
-  | Ok query -> (
-      let* body = Dream.body req in
-      let body =
-        Generated_types.CreateConversationInput.t_of_yojson
-          (Yojson.Safe.from_string body)
-      in
-      let* (result :
-             ( Generated_types.CreateConversationOutput.t,
-               Dream.response Lwt.t )
-             result) =
-        Handlers.Server.create_conversation req query body
-      in
-      match result with
-      | Ok result ->
-          result |> Generated_types.CreateConversationOutput.yojson_of_t
-          |> Yojson.Safe.to_string |> Dream.json
-      | Error response -> response)
+  let* body = Dream.body req in
+  let body =
+    Generated_types.CreateConversationInput.t_of_yojson
+      (Yojson.Safe.from_string body)
+  in
+  let* (result :
+         ( Generated_types.CreateConversationOutput.t,
+           Dream.response Lwt.t )
+         result) =
+    Handlers.Server.create_conversation req body
+  in
+  match result with
+  | Ok result ->
+      result |> Generated_types.CreateConversationOutput.yojson_of_t
+      |> Yojson.Safe.to_string |> Dream.json
+  | Error response -> response
 
 let update_conversation (req : Dream.request) =
   let conversation_id = Dream.param req "conversation_id" in
